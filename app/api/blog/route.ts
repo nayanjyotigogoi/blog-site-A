@@ -1,13 +1,9 @@
+// app/api/blog/route.ts
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-// ✅ Create the Supabase client instance
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 export async function GET(request: Request) {
+  const supabase = createServerSupabaseClient()
   const { searchParams } = new URL(request.url)
   const slug = searchParams.get("slug")
   const page = Number.parseInt(searchParams.get("page") || "1")
@@ -49,12 +45,21 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const supabase = createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const blogPost = await request.json()
 
     const { data, error } = await supabase
       .from("blog_posts")
-      .insert([blogPost])
+      .insert([{ ...blogPost, user_id: user.id }])
       .select()
       .single()
 

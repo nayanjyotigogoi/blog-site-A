@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { createServerSupabaseClient } from "@/lib/supabase/serverAction"
 import { redirect } from "next/navigation"
 
 export async function login(formData: FormData) {
@@ -18,9 +18,9 @@ export async function login(formData: FormData) {
     return { error: error.message }
   }
 
-  // Revalidate path to update session cookies and redirect
-  // redirect('/admin') // This redirect will happen on the client-side after the toast
-  return { error: null }
+  // You can redirect here OR handle it on the client side
+  redirect("/admin") // If doing server redirect
+  // return { error: null } // If handling in client
 }
 
 export async function signup(formData: FormData) {
@@ -32,12 +32,12 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`, // Optional: for email confirmation
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
     },
   })
 
   if (error) {
-    console.error("Sign up error:", error.message)
+    console.error("Signup error:", error.message)
     return { error: error.message }
   }
 
@@ -49,7 +49,7 @@ export async function resetPassword(formData: FormData) {
   const supabase = createServerSupabaseClient()
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/update-password`, // URL where user will set new password
+    redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/update-password`,
   })
 
   if (error) {
@@ -69,7 +69,7 @@ export async function logout() {
     return { error: error.message }
   }
 
-  redirect("/login") // Redirect to login page after logout
+  redirect("/login")
 }
 
 export async function getSession() {

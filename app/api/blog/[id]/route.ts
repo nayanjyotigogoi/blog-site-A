@@ -1,10 +1,10 @@
+// app/api/blog/[id]/route.ts
 import { NextResponse } from "next/server"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const supabase = createServerSupabaseClient()
-  const resolvedParams = await params // Await params
-  const { id } = resolvedParams
+  const { id } = params
 
   const { data, error } = await supabase.from("blog_posts").select("*").eq("id", id).single()
 
@@ -27,11 +27,15 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const resolvedParams = await params // Await params
-  const { id } = resolvedParams
+  const { id } = params
   const updates = await request.json()
 
-  const { data, error } = await supabase.from("blog_posts").update(updates).eq("id", id).select().single()
+  const { data, error } = await supabase
+    .from("blog_posts")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single()
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -49,8 +53,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const resolvedParams = await params // Await params
-  const { id } = resolvedParams
+  const { id } = params
 
   const { error } = await supabase.from("blog_posts").delete().eq("id", id)
 
