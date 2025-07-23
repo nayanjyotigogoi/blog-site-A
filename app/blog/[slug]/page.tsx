@@ -24,9 +24,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link href="/" passHref>
+        <Link href="/blog" passHref>
           {" "}
-          {/* Changed href to / */}
+          {/* Changed href to /blog */}
           <Button variant="ghost" className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
             Back to Blog

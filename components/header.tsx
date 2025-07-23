@@ -81,7 +81,7 @@ export default function Header() {
     },
     {
       name: t("nav.blog"),
-      href: "/", // Blog link points to the local root (which is the blog)
+      href: "/blog", // Blog link points to the local /blog route
       onClick: undefined, // No external navigation for blog
     },
     {
@@ -97,7 +97,7 @@ export default function Header() {
   ]
 
   // isActiveBlogPage now checks if the current path is the root or starts with /blog/
-  const isActiveBlogPage = pathname === "/" || pathname?.startsWith("/blog/")
+  const isActiveBlogPage = pathname === "/blog" || pathname?.startsWith("/blog/")
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -106,7 +106,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image
-              src="/Logo/Anvaya-logo-only.png" // Replace with the correct path to your logo file
+              src="/favicon_io/favicon-32x32.png" // Replace with the correct path to your logo file
               alt="Anvaya Solution Logo"
               width={32}
               height={32}
