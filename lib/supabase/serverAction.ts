@@ -1,28 +1,39 @@
-// lib/supabase/serverAction.ts
-import { createServerClient, type CookieOptions } from "@supabase/ssr"
-import { cookies } from "next/headers"
+"use server"
 
-export function createServerSupabaseClient() {
-  const cookieStore = cookies()
+import { createServerSupabaseClient } from "./server"
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+export async function login(formData: FormData) {
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
+  const supabase = createServerSupabaseClient()
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Supabase environment variables are not set.")
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+  if (error) {
+    console.error("Login error:", error.message)
+    return { error: error.message }
   }
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      async get(name: string) {
-        return (await cookieStore.get(name))?.value
-      },
-      set(name: string, value: string, options: CookieOptions) {
-        cookieStore.set({ name, value, ...options })
-      },
-      remove(name: string, options: CookieOptions) {
-        cookieStore.set({ name, value: "", ...options })
-      },
-    },
-  })
+  return { error: null }
+}
+
+export async function logout() {
+  const supabase = createServerSupabaseClient()
+  const { error } = await supabase.auth.signOut()
+
+  if (error) {
+    console.error("Logout error:", error.message)
+    return { error: error.message }
+  }
+
+  return { error: null }
+}
+
+export async function getSession() {
+  const supabase = createServerSupabaseClient()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return session
 }
